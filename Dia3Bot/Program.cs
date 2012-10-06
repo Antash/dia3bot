@@ -1,6 +1,7 @@
 ﻿using ScreenshotCaptureWithMouse.ScreenCapture;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -34,12 +35,45 @@ namespace Dia3Bot
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
 
+        [DllImport("user32.dll")]
+        static extern bool PostMessage(IntPtr hWnd, UInt32 Msg, int wParam, int lParam);
+
+        [DllImport("user32.dll")]
+        static extern int SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        internal static extern int GetWindowText(IntPtr hWnd, [Out] StringBuilder lpString, int nMaxCount);
+
         static public void DoMouseLeftClick()
         {
             //Call the imported function with the cursor's current position
             uint X = (uint) Cursor.Position.X;
             uint Y = (uint) Cursor.Position.Y;
             mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+        }
+
+        // Messages
+        const int WM_KEYDOWN = 0x100;
+        const int WM_KEYUP = 0x101;
+        const int WM_CHAR = 0x105;
+        const int WM_SYSKEYDOWN = 0x104;
+        const int WM_SYSKEYUP = 0x105;
+
+        static public void DoKeyPress()
+        {
+            // numpad 0 works ok!
+            IntPtr handle = GetForegroundWindow();
+            StringBuilder stringBuilder = new StringBuilder(256);
+            GetWindowText(handle, stringBuilder, stringBuilder.Capacity);
+            Console.WriteLine();
+            if (stringBuilder.ToString().Contains("Diablo"))
+            {
+                SendMessage(handle, WM_SYSKEYDOWN, Convert.ToInt32(Keys.NumPad0), 0);
+                SendMessage(handle, WM_SYSKEYUP, Convert.ToInt32(Keys.NumPad0), 0);
+            }
         }
 
         static public System.Drawing.Color GetPixelColor(int x, int y)
@@ -122,7 +156,8 @@ namespace Dia3Bot
                 //Cursor.Position = p[i];
                 //i += i == 3 ? -i : 1;
                 //DoMouseLeftClick();
-                GetCursorType();
+                //GetCursorType();
+                //DoKeyPress();
             }
             
         }
