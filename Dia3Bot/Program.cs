@@ -1,4 +1,7 @@
-﻿using ScreenshotCaptureWithMouse.ScreenCapture;
+﻿using Emgu.CV;
+using Emgu.CV.Structure;
+using Emgu.Util;
+using ScreenshotCaptureWithMouse.ScreenCapture;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -137,6 +140,8 @@ namespace Dia3Bot
 
         static void Main(string[] args)
         {
+            System.Threading.Timer t = new System.Threading.Timer(TimerCallback, new Point(0, 1), 0, 1000);
+            
             Rectangle r = Screen.PrimaryScreen.Bounds;
             Size screenSize = r.Size;
 
@@ -150,16 +155,53 @@ namespace Dia3Bot
                         };
 
             int i = 0;
-            while (true)
+            foo();
+            //while (true)
+            //{
+            //    Thread.Sleep(2000);
+            //    //Cursor.Position = p[i];
+            //    //i += i == 3 ? -i : 1;
+            //    //DoMouseLeftClick();
+            //    //GetCursorType();
+            //    //DoKeyPress();
+            //}
+        }
+
+        static void foo()
+        {
+            //Bitmap bmpSnip = new Bitmap(@"D:\arrow.jpg");
+            //Bitmap bmpSnip = new Bitmap(@"D:\gold_pattern.jpg");
+            Bitmap bmpSnip = new Bitmap(@"D:\magic.jpg");
+            //Bitmap bmpSnip = new Bitmap(@"D:\char.jpg");
+            //Bitmap bmpSnip = new Bitmap(@"D:\arrow2.png");
+            Bitmap bmpSource = new Bitmap(@"D:\2.jpg");
+            Image<Emgu.CV.Structure.Bgr, Byte> templateImage = new Image<Emgu.CV.Structure.Bgr, Byte>(bmpSnip);
+            Image<Emgu.CV.Structure.Bgr, Byte> sourceImage = new Image<Emgu.CV.Structure.Bgr, Byte>(bmpSource);
+            Image<Emgu.CV.Structure.Gray, float> imgMatch = sourceImage.MatchTemplate(templateImage, Emgu.CV.CvEnum.TM_TYPE.CV_TM_CCOEFF_NORMED);
+
+            float[, ,] matches = imgMatch.Data;
+            for (int y = 0; y < matches.GetLength(0); y++)
             {
-                Thread.Sleep(2000);
-                //Cursor.Position = p[i];
-                //i += i == 3 ? -i : 1;
-                //DoMouseLeftClick();
-                //GetCursorType();
-                //DoKeyPress();
+                for (int x = 0; x < matches.GetLength(1); x++)
+                {
+                    double matchScore = matches[y, x, 0];
+                    if (matchScore > 0.7)
+                    {
+                        Rectangle rect = new Rectangle(new Point(x, y),
+                            new Size(templateImage.Width, templateImage.Height));
+                        sourceImage.Draw(rect, new Bgr(Color.White), 2);
+                    }
+
+                }
+
             }
-            
+            //sourceImage = sourceImage.SmoothBlur(1, 0);
+            sourceImage.Save(String.Format("D:\\2_{0}.jpg", DateTime.Now.Ticks));
+        }
+
+        private static void TimerCallback(object state)
+        {
+            Console.WriteLine(state);
         }
     }
 }
