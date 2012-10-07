@@ -155,7 +155,8 @@ namespace Dia3Bot
                         };
 
             int i = 0;
-            foo();
+            bar();
+            //foo();
             //while (true)
             //{
             //    Thread.Sleep(2000);
@@ -195,6 +196,69 @@ namespace Dia3Bot
                 }
 
             }
+            //sourceImage = sourceImage.SmoothBlur(1, 0);
+            sourceImage.Save(String.Format("D:\\2_{0}.jpg", DateTime.Now.Ticks));
+        }
+
+        static void bar()
+        {
+            //Bitmap bmpSnip = new Bitmap(@"D:\arrow.jpg");
+            //Bitmap bmpSnip = new Bitmap(@"D:\gold_pattern.jpg");
+            Bitmap bmpSnip = new Bitmap(@"D:\magic.jpg");
+            //Bitmap bmpSnip = new Bitmap(@"D:\char.jpg");
+            //Bitmap bmpSnip = new Bitmap(@"D:\arrow2.png");
+            Bitmap bmpSource = new Bitmap(@"D:\2.jpg");
+            Image<Emgu.CV.Structure.Bgr, Byte> templateImage = new Image<Emgu.CV.Structure.Bgr, Byte>(bmpSnip);
+            Image<Emgu.CV.Structure.Bgr, Byte> sourceImage = new Image<Emgu.CV.Structure.Bgr, Byte>(bmpSource);
+
+            List<MCvBox2D> boxList = new List<MCvBox2D>();
+
+            //Load the image from file
+
+            //Convert the image to grayscale and filter out the noise
+            //Image<Gray, Byte> gray = sourceImage.Convert<Gray, Byte>().PyrDown().PyrUp();
+
+            Gray cannyThreshold = new Gray(180);
+            Gray cannyThresholdLinking = new Gray(120);
+            Gray circleAccumulatorThreshold = new Gray(120);
+
+            Image<Gray, Byte> cannyEdges = sourceImage.Canny(0, 200, 3);
+
+            using (MemStorage storage = new MemStorage()) //allocate storage for contour approximation
+                for (Contour<Point> contours = cannyEdges.FindContours(); contours != null; contours = contours.HNext)
+                {
+                    Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);
+
+                    if (contours.Area > 600) //only consider contours with area greater than 250
+
+                        if (currentContour.Total == 4) //The contour has 4 vertices.
+                        {
+                            #region determine if all the angles in the contour are within the range of [80, 100] degree
+                            bool isRectangle = true;
+                            Point[] pts = currentContour.ToArray();
+                            LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
+
+                            for (int i = 0; i < edges.Length; i++)
+                            {
+                                double angle = Math.Abs(
+                                   edges[(i + 1) % edges.Length].GetExteriorAngleDegree(edges[i]));
+                                if (angle < 80 || angle > 100)
+                                {
+                                    isRectangle = false;
+                                    break;
+                                }
+                            }
+                            #endregion
+
+                            if (isRectangle) boxList.Add(currentContour.GetMinAreaRect());
+                        }
+                    }
+            foreach (var rect in boxList)
+            {
+                RectangleF r = new RectangleF(rect.center.X, rect.center.Y, rect.size.Width, rect.size.Height);
+                sourceImage.Draw(rect, new Bgr(Color.Red), 2);
+            }
+
             //sourceImage = sourceImage.SmoothBlur(1, 0);
             sourceImage.Save(String.Format("D:\\2_{0}.jpg", DateTime.Now.Ticks));
         }
