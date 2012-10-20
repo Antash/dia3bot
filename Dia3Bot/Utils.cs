@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Emgu.CV;
+using Emgu.CV.Structure;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -21,7 +23,7 @@ namespace Dia3Bot
 			return color;
 		}
 
-		static Bitmap CaptureCursor(ref int x, ref int y)
+		public static Bitmap CaptureCursor(ref int x, ref int y)
 		{
 			Bitmap bmp;
 			IntPtr hicon;
@@ -46,6 +48,28 @@ namespace Dia3Bot
 			}
 
 			return null;
+		}
+
+		public static bool IsMatch(Bitmap orig, Bitmap bmp)
+		{
+			Image<Emgu.CV.Structure.Bgr, Byte> templateImage = new Image<Emgu.CV.Structure.Bgr, Byte>(bmp);
+			Image<Emgu.CV.Structure.Bgr, Byte> sourceImage = new Image<Emgu.CV.Structure.Bgr, Byte>(orig);
+			Image<Emgu.CV.Structure.Gray, float> imgMatch = sourceImage.MatchTemplate(templateImage, Emgu.CV.CvEnum.TM_TYPE.CV_TM_CCOEFF_NORMED);
+
+			float[,,] matches = imgMatch.Data;
+			for (int y = 0; y < matches.GetLength(0); y++)
+			{
+				for (int x = 0; x < matches.GetLength(1); x++)
+				{
+					double matchScore = matches[y, x, 0];
+					if (matchScore > 0.8)
+					{
+						return true;
+					}
+
+				}
+			}
+			return false;
 		}
 
 		public static bool IsDiabloWindowActive()
