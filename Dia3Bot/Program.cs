@@ -17,12 +17,38 @@ namespace Dia3Bot
 {
     class Program
     {
+		public enum CursorType { Arrow, Sword, Sell, Talk, Hand, None }
+
+		static List<KeyValuePair<CursorType, Bitmap>> cursors = new List<KeyValuePair<CursorType, Bitmap>>();
+
+		static public void InitCursorCollection()
+		{
+			cursors.Add(new KeyValuePair<CursorType, Bitmap>(CursorType.Arrow, new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\arrow.jpg"))));
+			cursors.Add(new KeyValuePair<CursorType, Bitmap>(CursorType.Hand, new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\hand.jpg"))));
+			cursors.Add(new KeyValuePair<CursorType, Bitmap>(CursorType.Sell, new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\sell.jpg"))));
+			cursors.Add(new KeyValuePair<CursorType, Bitmap>(CursorType.Sword, new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\sword.jpg"))));
+			cursors.Add(new KeyValuePair<CursorType, Bitmap>(CursorType.Talk, new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\talk.jpg"))));
+		}
+
+		static public CursorType DetectCurrentCursor()
+		{
+			if (!Utils.IsDiabloWindowActive())
+				return CursorType.None;
+
+			int x = 0, y = 0;
+			Bitmap t = Utils.CaptureCursor(ref x, ref y);
+			if (t != null)
+				cursors.ForEach(c => { if (Utils.IsMatch(t, c.Value)) return c.Key; });
+
+			return CursorType.None;
+		}
+
         static public bool DetectMovement()
         {
             return false;
         }
 
-		static List<KeyValuePair<string, Bitmap>> cursors = new List<KeyValuePair<string,Bitmap>>();
+		
 
         static public void GetCursor()
         {
@@ -34,22 +60,12 @@ namespace Dia3Bot
 			//long id = DateTime.Now.Ticks;
 			//bmp.Save(String.Format("D:\\screen_part_{0}.jpg", id), ImageFormat.Jpeg);
 
-			if (!Utils.IsDiabloWindowActive())
-				return;
-
-			int x = 0, y = 0;
-			Bitmap t = Utils.CaptureCursor(ref x, ref y);
-			if (t != null)
-				cursors.ForEach(c => { if (Utils.IsMatch(t, c.Value)) Console.WriteLine(c.Key); });
+			
         }
 
         static void Main(string[] args)
         {
-			cursors.Add(new KeyValuePair<string, Bitmap>("arrow", new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\arrow.jpg"))));
-			cursors.Add(new KeyValuePair<string, Bitmap>("hand", new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\hand.jpg"))));
-			cursors.Add(new KeyValuePair<string, Bitmap>("sell", new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\sell.jpg"))));
-			cursors.Add(new KeyValuePair<string, Bitmap>("sword", new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\sword.jpg"))));
-			cursors.Add(new KeyValuePair<string, Bitmap>("voice", new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\voice.jpg"))));
+
 
             System.Threading.Timer t = new System.Threading.Timer(TimerCallback, null, 0, 1000);
             
