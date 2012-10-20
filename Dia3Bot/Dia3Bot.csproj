@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventGenerator.cs" />
+    <Compile Include="FrameState.cs" />
     <Compile Include="KeyboardEventGenerator.cs" />
     <Compile Include="MouseEvent.cs" />
     <Compile Include="MouseEventGenerator.cs" />
