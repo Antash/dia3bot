@@ -23,6 +23,11 @@ namespace Dia3Bot
 			return color;
 		}
 
+		static public System.Drawing.Color GetPixelColor(Point p)
+		{
+			return GetPixelColor(p.X, p.Y);
+		}
+
 		public static Bitmap CaptureCursor(ref int x, ref int y)
 		{
 			Bitmap bmp;
