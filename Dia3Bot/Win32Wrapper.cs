@@ -64,6 +64,9 @@ namespace Dia3Bot
 		[DllImport("user32.dll", EntryPoint = "GetIconInfo")]
 		public static extern bool GetIconInfo(IntPtr hIcon, out ICONINFO piconinfo);
 
+        [DllImport("user32.dll", EntryPoint = "GetDesktopWindow")]
+        public static extern IntPtr GetDesktopWindow();
+
 		[DllImport("user32.dll")]
 		public static extern IntPtr GetDC(IntPtr hwnd);
 
@@ -84,5 +87,8 @@ namespace Dia3Bot
 
 		[DllImport("user32.dll")]
 		public static extern int SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+
+        [DllImport("Shell32.dll", CharSet = CharSet.Auto)]
+        public static extern void SHChangeNotify(int wEventId, int uFlags, IntPtr dwItem1, IntPtr dwItem2);
 	}
 }
