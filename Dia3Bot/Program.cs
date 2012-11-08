@@ -30,54 +30,6 @@ namespace Dia3Bot
 			cursors.Add(new KeyValuePair<CursorType, Bitmap>(CursorType.Talk, new Bitmap(Bitmap.FromFile(@"..\..\..\cursors\talk.jpg"))));
 		}
 
-		static public CursorType DetectCurrentCursor()
-		{
-			if (!Utils.IsDiabloWindowActive())
-				return CursorType.None;
-
-			int x = 0, y = 0;
-			Bitmap t = Utils.CaptureCursor(ref x, ref y);
-			if (t != null)
-				foreach (var c in cursors)
-					if (Utils.IsMatch(t, c.Value))
-						return c.Key;
-
-			return CursorType.None;
-		}
-
-		static FrameState prevState;
-
-		static public void InitStateBasePoints(int count)
-		{
-			points = new Point[count];
-			int w = Screen.PrimaryScreen.Bounds.Size.Width;
-			int h = Screen.PrimaryScreen.Bounds.Size.Height;
-
-			Random r = new Random(1000);
-			for (int i = 0; i < count; i++)
-			{
-				points[i] = new Point(r.Next(1, w), r.Next(1, h));
-			}
-		}
-
-		static Point[] points;
-
-		static public bool DetectMovement()
-		{
-			FrameState newState = new FrameState(points);
-
-			if (prevState == null)
-			{
-				prevState = new FrameState(points);
-				return false;
-			}
-			bool res = prevState.Compare(newState);
-			prevState = newState;
-			return res;
-		}
-
-
-
 		//static public void GetCursor()
 		//{
 		//	//Rectangle rect = new Rectangle(Cursor.Position, new Size(100, 100));
@@ -93,7 +45,7 @@ namespace Dia3Bot
 
 		const int offsetX = 0, offsetY = -35;
 		const int delta = 50;
-		Point[] p = {
+		static Point[] p = {
                             new Point(Screen.PrimaryScreen.Bounds.Size.Width / 2 + offsetX, Screen.PrimaryScreen.Bounds.Size.Height / 2 + offsetY - delta),
                             new Point(Screen.PrimaryScreen.Bounds.Size.Width / 2 + offsetX + delta, Screen.PrimaryScreen.Bounds.Size.Height / 2 + offsetY),
                             new Point(Screen.PrimaryScreen.Bounds.Size.Width / 2 + offsetX, Screen.PrimaryScreen.Bounds.Size.Height / 2 + offsetY + delta),
@@ -102,10 +54,12 @@ namespace Dia3Bot
 
 		static void Main(string[] args)
 		{
-			InitStateBasePoints(30);
 			InitCursorCollection();
 
-			System.Threading.Timer t = new System.Threading.Timer(TimerCallback, null, 0, 300);
+			MotionDetector md = new MotionDetector();
+			md.NoMotion += md_NoMotion;
+			//some shit
+			//System.Threading.Timer t = new System.Threading.Timer(TimerCallback, null, 0, 500);
 
 			while (true) ;
 			//{
@@ -116,6 +70,26 @@ namespace Dia3Bot
 			//    //GetCursorType();
 			//    //DoKeyPress();
 			//}
+		}
+
+		public static void MouseLeftClick(Point p)
+		{
+			//| Win32Wrapper.MOUSEEVENTF_LEFTUP
+			Win32Wrapper.mouse_event(Win32Wrapper.MOUSEEVENTF_LEFTDOWN , (uint)p.X, (uint)p.Y, 0, 0);
+		}
+
+		public static void MouseLeftUp(Point p)
+		{
+			//| Win32Wrapper.MOUSEEVENTF_LEFTUP
+			Win32Wrapper.mouse_event(Win32Wrapper.MOUSEEVENTF_LEFTUP, (uint)p.X, (uint)p.Y, 0, 0);
+		}
+
+		static int i = 0;
+
+		static void md_NoMotion(object sender, EventArgs e)
+		{
+			MouseLeftUp(p[i]);
+			i = i == 3 ? 0 : i+1;
 		}
 
 		static void bar()
@@ -186,23 +160,7 @@ namespace Dia3Bot
 
 		private static void TimerCallback(object state)
 		{
-
-			if (ismoving)
-			{
-				if (!DetectMovement())
-				{
-					ismoving = false;
-					Console.WriteLine(String.Format("Moving from {0} to {1}", datestartmov.ToShortTimeString(), DateTime.Now.ToShortTimeString()));
-				}
-			}
-			else
-			{
-				if (DetectMovement())
-				{
-					datestartmov = DateTime.Now;
-					ismoving = true;
-				}
-			}
+			MouseLeftClick(p[i]);
 		}
 	}
 }
