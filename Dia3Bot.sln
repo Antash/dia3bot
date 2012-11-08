@@ -3,6 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dia3Bot", "Dia3Bot\Dia3Bot.csproj", "{A3AF4364-E1B5-402C-8DE0-B9A7F596FC6F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "refbin", "refbin", "{46FBB0B2-1905-46F7-AA82-A2FE2BBE4BBA}"
+	ProjectSection(SolutionItems) = preProject
+		refbin\Emgu.CV.dll = refbin\Emgu.CV.dll
+		refbin\Emgu.CV.UI.dll = refbin\Emgu.CV.UI.dll
+		refbin\Emgu.Util.dll = refbin\Emgu.Util.dll
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
