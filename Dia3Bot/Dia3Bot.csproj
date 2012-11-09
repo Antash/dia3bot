@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="EventGenerator.cs" />
     <Compile Include="FrameCapture.cs" />
+    <Compile Include="FrameChecker.cs" />
     <Compile Include="KeyboardEventGenerator.cs" />
     <Compile Include="MotionDetector.cs" />
     <Compile Include="MouseEvent.cs" />
