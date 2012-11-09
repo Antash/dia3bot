@@ -67,6 +67,9 @@ namespace Dia3Bot
 				//update the motion history
 				_motionHistory.Update(_forgroundDetector.ForgroundMask);
 
+				//save motion frames bitmap
+				//_forgroundDetector.ForgroundMask.Save(String.Format("D:\\1\\motion_mask_{0}.jpg", DateTime.Now.Ticks));
+
 				storage.Clear(); //clear the storage
 				Seq<MCvConnectedComp> motionComponents = _motionHistory.GetMotionComponents(storage);
 

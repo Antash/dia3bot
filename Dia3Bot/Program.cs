@@ -60,8 +60,8 @@ namespace Dia3Bot
 			md.NoMotion += md_NoMotion;
 			//some shit
 			//System.Threading.Timer t = new System.Threading.Timer(TimerCallback, null, 0, 500);
-
-			while (true) ;
+			
+			while (true);
 			//{
 			//    Thread.Sleep(2000);
 			//    //Cursor.Position = p[i];
@@ -88,8 +88,8 @@ namespace Dia3Bot
 
 		static void md_NoMotion(object sender, EventArgs e)
 		{
-			MouseLeftUp(p[i]);
-			i = i == 3 ? 0 : i+1;
+			//MouseLeftUp(p[i]);
+			//i = i == 3 ? 0 : i+1;
 		}
 
 		static void bar()
